@@ -1,2 +1,2 @@
 # mugres-midi-jam
-Jam with others network players using MIDI
+Jam with other network players using MIDI
