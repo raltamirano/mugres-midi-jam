@@ -5,7 +5,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>mugres</groupId>
-  <artifactId>midi-jam</artifactId>
+  <artifactId>mugres-midi-jam</artifactId>
   <version>0.0.1</version>
   <name>MUGRES MIDI Jam</name>
 
@@ -68,6 +68,14 @@
             <phase>deploy</phase>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+        </configuration>
       </plugin>
     </plugins>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
