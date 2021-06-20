@@ -1,5 +1,6 @@
 package mugres.apps.midijam;
 
+import mugres.ipc.Envelope;
 import mugres.ipc.Listener;
 import mugres.ipc.protocol.Message;
 import mugres.ipc.protocol.messages.SignalsMessage;
@@ -12,10 +13,10 @@ public class MessageProcessor implements Listener {
     }
 
     @Override
-    public void onMessage(final Message message) {
-        switch (message.type()) {
+    public void onMessage(final Envelope<Message> message) {
+        switch (message.payload().type()) {
             case SIGNALS:
-                final SignalsMessage signalsMessage = (SignalsMessage) message;
+                final SignalsMessage signalsMessage = (SignalsMessage) message.payload();
                 signalsMessage.signals().forEach(mugresOutput()::send);
                 break;
             default:
