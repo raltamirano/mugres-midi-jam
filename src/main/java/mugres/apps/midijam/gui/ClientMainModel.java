@@ -65,8 +65,8 @@ public class ClientMainModel {
 
     public void noteOn(final Pitch pitch, final int velocity) {
         try {
-            client.broadcast(new SignalsMessage(Signals.of(Signal.of(UUID.randomUUID(), System.currentTimeMillis(),
-                    DEFAULT_CHANNEL, Played.of(pitch, velocity), true))));
+            Common.mugresInput().send(Signal.of(UUID.randomUUID(), System.currentTimeMillis(),
+                    DEFAULT_CHANNEL, Played.of(pitch, velocity), true));
         } catch (final Throwable t) {
             System.out.println("NoteOn error: " + t);
         }
@@ -74,8 +74,8 @@ public class ClientMainModel {
 
     public void noteOff(final Pitch pitch) {
         try {
-            client.broadcast(new SignalsMessage(Signals.of(Signal.of(UUID.randomUUID(), System.currentTimeMillis(),
-                    DEFAULT_CHANNEL, Played.of(pitch, 0), false))));
+            Common.mugresInput().send(Signal.of(UUID.randomUUID(), System.currentTimeMillis(),
+                    DEFAULT_CHANNEL, Played.of(pitch, 0), false));
         } catch (final Throwable t) {
             System.out.println("NoteOff error: " + t);
         }
