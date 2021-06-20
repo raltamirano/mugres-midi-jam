@@ -4,9 +4,11 @@ import mugres.core.MUGRES;
 import mugres.core.common.Context;
 import mugres.core.common.io.Input;
 import mugres.core.common.io.Output;
+import mugres.core.common.io.SimpleInput;
 import mugres.core.filter.Filter;
 import mugres.core.filter.builtin.system.Monitor;
 import mugres.core.live.processor.transformer.Transformer;
+import mugres.ipc.tcpip.MUGRESTCPIPClient;
 import mugres.ipc.tcpip.MUGRESTCPIPNode;
 
 import static java.util.Collections.emptyMap;
@@ -18,12 +20,15 @@ public class Common {
 
     private Common() {}
 
-    public static void setup(final MUGRESTCPIPNode node) {
-        mugresInput = Input.midiInput(MUGRES.getMidiInputPort());
-        mugresOutput = Output.midiOutput(MUGRES.getMidiOutputPort());
+    public static void setup() {
+        try {
+            mugresInput = Input.midiInput(MUGRES.getMidiInputPort());
+        } catch (final Throwable t) {
+            mugresInput = new SimpleInput();
+        }
 
+        mugresOutput = Output.midiOutput(MUGRES.getMidiOutputPort());
         registerForwardingFilter();
-        configureInputTransformer(node);
     }
 
     public static Input mugresInput() {
@@ -38,7 +43,7 @@ public class Common {
         Filter.register(ForwardingFilter.NAME, ForwardingFilter.class);
     }
 
-    private static void configureInputTransformer(final MUGRESTCPIPNode node) {
+    public synchronized static void configureInputTransformer(final MUGRESTCPIPNode node) {
         final mugres.core.live.processor.transformer.config.Configuration config =
                 new mugres.core.live.processor.transformer.config.Configuration();
 
@@ -53,6 +58,11 @@ public class Common {
                 mugresOutput,
                 config);
         transformer.start();
+    }
+
+    public synchronized static void removeInputTransformer() {
+        transformer.stop();
+        transformer = null;
     }
 
     public static final String NODE = "node";

@@ -7,7 +7,8 @@ import mugres.core.utils.IPCUtils;
  */
 public class JamServer {
     public static void main(final String[] args) {
-        IPCUtils.runMUGRESTCPIPServer("MIDI Jam Server", args, MessageProcessor.of(), Common::setup);
+        Common.setup();
+        IPCUtils.runMUGRESTCPIPServer("MIDI Jam Server", args, MessageProcessor.of(), Common::configureInputTransformer);
     }
 }
 

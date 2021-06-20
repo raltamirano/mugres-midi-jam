@@ -7,7 +7,8 @@ import mugres.core.utils.IPCUtils;
  */
 public class JamClient {
     public static void main(final String[] args) {
-        IPCUtils.runMUGRESTCPIPClient(args, MessageProcessor.of(), Common::setup);
+        Common.setup();
+        IPCUtils.runMUGRESTCPIPClient(args, MessageProcessor.of(), Common::configureInputTransformer);
     }
 }
 
