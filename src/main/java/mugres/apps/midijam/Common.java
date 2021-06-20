@@ -6,6 +6,7 @@ import mugres.core.common.io.Input;
 import mugres.core.common.io.Output;
 import mugres.core.common.io.SimpleInput;
 import mugres.core.filter.Filter;
+import mugres.core.filter.builtin.misc.Clear;
 import mugres.core.filter.builtin.system.Monitor;
 import mugres.core.live.processor.transformer.Transformer;
 import mugres.ipc.tcpip.MUGRESTCPIPNode;
@@ -48,6 +49,7 @@ public class Common {
 
         config.appendFilter(Monitor.NAME, emptyMap());
         config.appendFilter(ForwardingFilter.NAME, emptyMap());
+        config.appendFilter(Clear.NAME, emptyMap());
 
         final Context playContext = Context.ComposableContext.of(Context.createBasicContext());
         playContext.put(NODE, node);
