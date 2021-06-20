@@ -1,12 +1,13 @@
 package mugres.apps.midijam.gui;
 
+import mugres.apps.midijam.ClientState;
 import mugres.apps.midijam.Common;
-import mugres.apps.midijam.MessageProcessor;
+import mugres.apps.midijam.ClientMessageProcessor;
+import mugres.core.common.Instrument;
 import mugres.core.common.Pitch;
 import mugres.core.common.Played;
 import mugres.core.common.Signal;
-import mugres.core.common.Signals;
-import mugres.ipc.protocol.messages.SignalsMessage;
+import mugres.ipc.protocol.messages.SetPartyMessage;
 import mugres.ipc.tcpip.MUGRESTCPIPClient;
 import mugres.ipc.tcpip.MUGRESTCPIPServer;
 
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class ClientMainModel {
     private String host = "localhost";
     private int port = MUGRESTCPIPServer.DEFAULT_PORT;
+    private Instrument instrument = Instrument.Acoustic_Grand_Piano;
     private MUGRESTCPIPClient client;
 
     public synchronized boolean isConnected() {
@@ -38,6 +40,14 @@ public class ClientMainModel {
         this.port = port;
     }
 
+    public Instrument getInstrument() {
+        return instrument;
+    }
+
+    public void setInstrument(Instrument instrument) {
+        this.instrument = instrument;
+    }
+
     public boolean canConnect() {
         return host != null && !host.trim().isEmpty() && port > 0 && port < 65536;
     }
@@ -47,16 +57,22 @@ public class ClientMainModel {
             throw new IllegalStateException("Already connected!");
 
         client = MUGRESTCPIPClient.of(host, port);
-        client.setListener(MessageProcessor.of());
+        client.setListener(ClientMessageProcessor.of());
         client.connect();
 
         Common.configureInputTransformer(client);
+        ClientState.getInstance().setClient(client);
+        try {
+            client.sendToServer(SetPartyMessage.of(instrument));
+        } catch (final Throwable ignore) {}
+
     }
 
     public synchronized void disconnect() throws IOException {
         if (!isConnected())
             throw new IllegalStateException("Not connected!");
 
+        ClientState.getInstance().setClient(null);
         Common.removeInputTransformer();
 
         client.disconnect();

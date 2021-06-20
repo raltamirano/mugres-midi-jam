@@ -1,5 +1,6 @@
 package mugres.apps.midijam.gui;
 
+import mugres.core.common.Instrument;
 import mugres.core.common.Pitch;
 
 import java.util.HashSet;
@@ -79,11 +80,20 @@ public class ClientMainController {
         updateConnectionStatus();
     }
 
+    public void updateInstrument(final Instrument value) {
+        model.setInstrument(value);
+        updateOptions();
+    }
+
     private void updateConnectionData() {
         view.updateConnectionData(model.getHost(), model.getPort());
     }
 
     private void updateConnectionStatus() {
         view.updateConnectionStatus(model.canConnect(), model.isConnected());
+    }
+
+    private void updateOptions() {
+        view.updateOptions(model.getInstrument());
     }
 }

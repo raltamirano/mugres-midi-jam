@@ -1,5 +1,6 @@
 package mugres.apps.midijam.gui;
 
+import mugres.core.common.Instrument;
 import mugres.core.common.Note;
 import mugres.core.common.Pitch;
 
@@ -11,8 +12,9 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,14 +22,20 @@ import static java.awt.BorderLayout.CENTER;
 import static java.awt.BorderLayout.PAGE_END;
 import static mugres.core.common.Note.BASE_OCTAVE;
 
-public class ClientMainView extends JFrame implements ActionListener, ChangeListener, DocumentListener, KeyEventDispatcher {
+public class ClientMainView extends JFrame implements ActionListener, ChangeListener, DocumentListener, KeyEventDispatcher, ItemListener {
     private boolean connected;
     private ClientMainController controller;
     private JTextField hostTextField;
     private JSpinner portSpinner;
-    final JButton connectButton;
-    final JButton disconnectButton;
-    final JButton exitButton;
+    private JComboBox<InstrumentItemModel> instrumentComboBox;
+    private final JButton connectButton;
+    private final JButton disconnectButton;
+    private final JButton exitButton;
+    private static final DefaultComboBoxModel<InstrumentItemModel> INSTRUMENT_COMBO_BOX_MODEL = new DefaultComboBoxModel<>();
+
+    static {
+        populateInstrumentsComboBoxModel();
+    }
 
     public ClientMainView() {
         final KeyboardFocusManager keyboardFocusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager();
@@ -35,13 +43,18 @@ public class ClientMainView extends JFrame implements ActionListener, ChangeList
 
         setTitle(TITLE);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setMinimumSize(new Dimension(500, 100));
+        setMinimumSize(new Dimension(500, 150));
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(screenSize.width/2-this.getSize().width/2, screenSize.height/2-this.getSize().height/2);
 
+        // Main area panel
+        final JPanel mainAreaPanel = new JPanel();
+        mainAreaPanel.setLayout(new BoxLayout(mainAreaPanel, BoxLayout.Y_AXIS));
+        getContentPane().add(mainAreaPanel, CENTER);
+
         // Connection
         final JPanel connectionPanel = new JPanel();
-        getContentPane().add(connectionPanel, CENTER);
+        mainAreaPanel.add(connectionPanel);
 
         final JLabel hostLabel = new JLabel("Host: ");
         connectionPanel.add(hostLabel);
@@ -56,6 +69,16 @@ public class ClientMainView extends JFrame implements ActionListener, ChangeList
         portSpinner.setEditor(new JSpinner.NumberEditor(portSpinner,"#"));
         portSpinner.addChangeListener(this);
         connectionPanel.add(portSpinner);
+
+        // Options
+        final JPanel optionsPanel = new JPanel();
+        mainAreaPanel.add(optionsPanel);
+
+        final JLabel instrumentLabel = new JLabel("Instrument to play: ");
+        optionsPanel.add(instrumentLabel);
+        instrumentComboBox = new JComboBox<>(INSTRUMENT_COMBO_BOX_MODEL);
+        instrumentComboBox.addItemListener(this);
+        optionsPanel.add(instrumentComboBox);
 
 
         // Buttons
@@ -74,6 +97,12 @@ public class ClientMainView extends JFrame implements ActionListener, ChangeList
         exitButton.setActionCommand(EXIT);
         exitButton.addActionListener(this);
         buttonsPanel.add(exitButton);
+    }
+
+    private static void populateInstrumentsComboBoxModel() {
+        INSTRUMENT_COMBO_BOX_MODEL.removeAllElements();
+        for(int i=0; i<Instrument.values().length; i++)
+            INSTRUMENT_COMBO_BOX_MODEL.addElement(new InstrumentItemModel(Instrument.values()[i]));
     }
 
     public void setController(final ClientMainController controller) {
@@ -99,6 +128,19 @@ public class ClientMainView extends JFrame implements ActionListener, ChangeList
         disconnectButton.setEnabled(isConnected);
         hostTextField.setEnabled(!isConnected);
         portSpinner.setEnabled(!isConnected);
+        instrumentComboBox.setEnabled(!isConnected);
+    }
+
+    public void updateOptions(final Instrument instrument) {
+        instrumentComboBox.setSelectedIndex(indexOnInstrumentModel(instrument));
+    }
+
+    private int indexOnInstrumentModel(final Instrument instrument) {
+        if (instrument == null) return -1;
+        for(int i=0; i<INSTRUMENT_COMBO_BOX_MODEL.getSize(); i++)
+            if (INSTRUMENT_COMBO_BOX_MODEL.getElementAt(i).instrument().equals(instrument))
+                return i;
+        return -1;
     }
 
     public void notifyError(final String friendlyText, final Throwable error) {
@@ -156,6 +198,14 @@ public class ClientMainView extends JFrame implements ActionListener, ChangeList
         return true;
     }
 
+    @Override
+    public void itemStateChanged(final ItemEvent e) {
+        if (e.getStateChange() == ItemEvent.SELECTED) {
+            InstrumentItemModel item = (InstrumentItemModel) e.getItem();
+            controller.updateInstrument(item.instrument());
+        }
+    }
+
     private Pitch getPitchFromKey(final KeyEvent e) {
         return PITCH_MAP.get(Character.toLowerCase(e.getKeyChar()));
     }
@@ -209,5 +259,22 @@ public class ClientMainView extends JFrame implements ActionListener, ChangeList
         PITCH_MAP.put('o', Pitch.of(Note.D, BASE_OCTAVE+1));
         PITCH_MAP.put('0', Pitch.of(Note.DS, BASE_OCTAVE+1));
         PITCH_MAP.put('p', Pitch.of(Note.E, BASE_OCTAVE+1));
+    }
+
+    private static class InstrumentItemModel {
+        private final Instrument instrument;
+
+        public InstrumentItemModel(final Instrument instrument) {
+            this.instrument = instrument;
+        }
+
+        public Instrument instrument() {
+            return instrument;
+        }
+
+        @Override
+        public String toString() {
+            return instrument.getName();
+        }
     }
 }

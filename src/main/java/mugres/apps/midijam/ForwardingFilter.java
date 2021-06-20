@@ -33,7 +33,7 @@ public class ForwardingFilter extends Filter {
 
     private void forwardSignals(final Context context, final Signals signals) {
         try {
-            getNode(context).broadcast(new SignalsMessage(signals));
+            getNode(context).broadcast(SignalsMessage.of(signals));
         } catch (final Throwable t) {
             System.out.println("Error forwarding signals: " + t);
         }

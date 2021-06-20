@@ -8,7 +8,6 @@ import mugres.core.common.io.SimpleInput;
 import mugres.core.filter.Filter;
 import mugres.core.filter.builtin.system.Monitor;
 import mugres.core.live.processor.transformer.Transformer;
-import mugres.ipc.tcpip.MUGRESTCPIPClient;
 import mugres.ipc.tcpip.MUGRESTCPIPNode;
 
 import static java.util.Collections.emptyMap;
