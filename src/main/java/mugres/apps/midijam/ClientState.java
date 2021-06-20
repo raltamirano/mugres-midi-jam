@@ -3,7 +3,6 @@ package mugres.apps.midijam;
 import mugres.core.common.InstrumentChange;
 import mugres.core.common.Party;
 import mugres.ipc.tcpip.MUGRESTCPIPClient;
-import mugres.ipc.tcpip.MUGRESTCPIPServer;
 
 import java.util.ArrayList;
 import java.util.HashMap;

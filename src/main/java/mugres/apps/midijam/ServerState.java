@@ -32,8 +32,6 @@ public class ServerState {
         final Party party = new Party(name, instrument, 0);
         synchronized (partyList) {
             partyList.put(name, party);
-            // Update server's client state
-            ClientState.getInstance().updatePartyList(new ArrayList<>(partyList.values()));
         }
         broadcastPartyList();
     }
