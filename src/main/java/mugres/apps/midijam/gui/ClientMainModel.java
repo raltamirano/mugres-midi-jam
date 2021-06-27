@@ -1,8 +1,9 @@
 package mugres.apps.midijam.gui;
 
+import mugres.MUGRES;
+import mugres.apps.midijam.ClientMessageProcessor;
 import mugres.apps.midijam.ClientState;
 import mugres.apps.midijam.Common;
-import mugres.apps.midijam.ClientMessageProcessor;
 import mugres.core.common.Instrument;
 import mugres.core.common.Pitch;
 import mugres.core.common.Played;
@@ -81,7 +82,7 @@ public class ClientMainModel {
 
     public void noteOn(final Pitch pitch, final int velocity) {
         try {
-            Common.mugresInput().send(Signal.of(UUID.randomUUID(), System.currentTimeMillis(),
+            MUGRES.input().send(Signal.of(UUID.randomUUID(), System.currentTimeMillis(),
                     DEFAULT_CHANNEL, Played.of(pitch, velocity), true));
         } catch (final Throwable t) {
             System.out.println("NoteOn error: " + t);
@@ -90,7 +91,7 @@ public class ClientMainModel {
 
     public void noteOff(final Pitch pitch) {
         try {
-            Common.mugresInput().send(Signal.of(UUID.randomUUID(), System.currentTimeMillis(),
+            MUGRES.input().send(Signal.of(UUID.randomUUID(), System.currentTimeMillis(),
                     DEFAULT_CHANNEL, Played.of(pitch, 0), false));
         } catch (final Throwable t) {
             System.out.println("NoteOff error: " + t);

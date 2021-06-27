@@ -1,12 +1,11 @@
 package mugres.apps.midijam;
 
+import mugres.MUGRES;
 import mugres.ipc.Envelope;
 import mugres.ipc.Listener;
 import mugres.ipc.protocol.Message;
 import mugres.ipc.protocol.messages.PartyListMessage;
 import mugres.ipc.protocol.messages.SignalsMessage;
-
-import static mugres.apps.midijam.Common.mugresOutput;
 
 public class ClientMessageProcessor implements Listener {
     private ClientMessageProcessor() {}
@@ -21,7 +20,7 @@ public class ClientMessageProcessor implements Listener {
             case SIGNALS:
                 final SignalsMessage signalsMessage = (SignalsMessage) message.payload();
                 final int partyChannel = ClientState.getInstance().getPartyChannel(message.header().from());
-                signalsMessage.signals().forEach(s -> mugresOutput().send(s.modifiedChannel(partyChannel)));
+                signalsMessage.signals().forEach(s -> MUGRES.output().send(s.modifiedChannel(partyChannel)));
                 break;
             case PARTY_LIST:
                 final PartyListMessage partyListMessage = (PartyListMessage) message.payload();

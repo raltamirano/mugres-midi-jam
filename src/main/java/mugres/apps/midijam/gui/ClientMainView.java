@@ -274,7 +274,7 @@ public class ClientMainView extends JFrame implements ActionListener, ChangeList
 
         @Override
         public String toString() {
-            return instrument.getName();
+            return instrument.name();
         }
     }
 }

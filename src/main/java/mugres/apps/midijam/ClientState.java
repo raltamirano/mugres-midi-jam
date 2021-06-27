@@ -1,5 +1,6 @@
 package mugres.apps.midijam;
 
+import mugres.MUGRES;
 import mugres.core.common.InstrumentChange;
 import mugres.core.common.Party;
 import mugres.ipc.tcpip.MUGRESTCPIPClient;
@@ -35,9 +36,9 @@ public class ClientState {
             partyNamesList.clear();
             for(int i=0; i<newList.size(); i++) {
                 final Party party = newList.get(i);
-                partyList.put(party.getName(), party);
-                partyNamesList.add(party.getName());
-                Common.mugresOutput().send(InstrumentChange.of(i, party.getInstrument()));
+                partyList.put(party.name(), party);
+                partyNamesList.add(party.name());
+                MUGRES.output().send(InstrumentChange.of(i, party.instrument()));
             }
         }
     }
